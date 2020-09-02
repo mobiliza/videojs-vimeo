@@ -58062,7 +58062,8 @@
 	      url: this.options_.source.src,
 	      byline: false,
 	      portrait: false,
-	      title: false
+	      title: false,
+	      controls: false
 	    };
 
 	    if (this.options_.autoplay) {
@@ -58085,9 +58086,6 @@
 	    }
 	    if (this.options_.color) {
 	      vimeoOptions.color = this.options_.color.replace(/^#/, '');
-	    }
-	    if (this.options_.controls) {
-	      vimeoOptions.controls = this.options_.controls;
 	    }
 
 	    this._player = new Player$1(this.el(), vimeoOptions);
