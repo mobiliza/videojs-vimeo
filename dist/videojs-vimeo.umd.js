@@ -58066,6 +58066,8 @@
 	      controls: false
 	    };
 
+	    vimeoOptions.playsinline = this.options_.playsinline;
+
 	    if (this.options_.autoplay) {
 	      vimeoOptions.autoplay = true;
 	    }
@@ -58083,9 +58085,6 @@
 	    }
 	    if (this.options_.loop) {
 	      vimeoOptions.loop = this.options_.loop;
-	    }
-	    if (this.options_.playsinline) {
-	      vimeoOptions.playsinline = this.options_.playsinline;
 	    }
 	    if (this.options_.color) {
 	      vimeoOptions.color = this.options_.color.replace(/^#/, '');
