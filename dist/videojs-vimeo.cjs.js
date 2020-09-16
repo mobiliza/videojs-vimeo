@@ -59,6 +59,7 @@ class Vimeo extends Tech {
 
   initVimeoPlayer() {
     const vimeoOptions = {
+      // ...this.props.options_.vimeoOptions,
       url: this.options_.source.src,
       byline: false,
       portrait: false,
@@ -85,6 +86,9 @@ class Vimeo extends Tech {
     }
     if (this.options_.color) {
       vimeoOptions.color = this.options_.color.replace(/^#/, '');
+    }
+    if (typeof this.options_.playsinline !== 'undefined') {
+      vimeoOptions.playsinline = this.options_.playsinline;
     }
 
     this._player = new VimeoPlayer(this.el(), vimeoOptions);
