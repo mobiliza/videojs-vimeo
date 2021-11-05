@@ -1,9 +1,12 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+var videojs = require('video.js');
+var VimeoPlayer = require('@vimeo/player');
 
-var videojs = _interopDefault(require('video.js'));
-var VimeoPlayer = _interopDefault(require('@vimeo/player'));
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var videojs__default = /*#__PURE__*/_interopDefaultLegacy(videojs);
+var VimeoPlayer__default = /*#__PURE__*/_interopDefaultLegacy(VimeoPlayer);
 
 let cssInjected = false;
 
@@ -38,7 +41,7 @@ function injectCss() {
   head.appendChild(style);
 }
 
-const Tech = videojs.getTech('Tech');
+const Tech = videojs__default["default"].getTech('Tech');
 
 /**
  * Vimeo - Wrapper for Video Player API
@@ -87,7 +90,7 @@ class Vimeo extends Tech {
       vimeoOptions.color = this.options_.color.replace(/^#/, '');
     }
 
-    this._player = new VimeoPlayer(this.el(), vimeoOptions);
+    this._player = new VimeoPlayer__default["default"](this.el(), vimeoOptions);
     this.initVimeoState();
 
     ['play', 'pause', 'ended', 'timeupdate', 'progress', 'seeked'].forEach(e => {
@@ -111,6 +114,7 @@ class Vimeo extends Tech {
     });
     this._player.on('volumechange', (v) => (this._vimeoState.volume = v));
     this._player.on('error', e => this.trigger('error', e));
+    this._player.on('playing', e => this.trigger('playing', e));
 
     this.triggerReady();
   }
@@ -134,7 +138,7 @@ class Vimeo extends Tech {
   }
 
   createEl() {
-    const div = videojs.dom.createEl('div', {
+    const div = videojs__default["default"].dom.createEl('div', {
       id: this.options_.techId
     });
 
@@ -183,7 +187,7 @@ class Vimeo extends Tech {
   buffered() {
     const progress = this._vimeoState.progress;
 
-    return videojs.createTimeRange(0, progress.percent * progress.duration);
+    return videojs__default["default"].createTimeRange(0, progress.percent * progress.duration);
   }
 
   paused() {
@@ -208,6 +212,10 @@ class Vimeo extends Tech {
 
   playbackRate() {
     return 1;
+  }
+
+  readyState() {
+    return 3; /// HAVE_FUTURE_DATA
   }
 
 }
@@ -266,10 +274,10 @@ Vimeo.nativeSourceHandler.dispose = function () { };
 Vimeo.registerSourceHandler(Vimeo.nativeSourceHandler);
 
 // Older versions of VJS5 doesn't have the registerTech function
-if (typeof videojs.registerTech !== 'undefined') {
-  videojs.registerTech('Vimeo', Vimeo);
+if (typeof videojs__default["default"].registerTech !== 'undefined') {
+  videojs__default["default"].registerTech('Vimeo', Vimeo);
 } else {
-  videojs.registerComponent('Vimeo', Vimeo);
+  videojs__default["default"].registerComponent('Vimeo', Vimeo);
 }
 
 // Include the version number.

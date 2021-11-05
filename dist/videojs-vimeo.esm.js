@@ -107,6 +107,7 @@ class Vimeo extends Tech {
     });
     this._player.on('volumechange', (v) => (this._vimeoState.volume = v));
     this._player.on('error', e => this.trigger('error', e));
+    this._player.on('playing', e => this.trigger('playing', e));
 
     this.triggerReady();
   }
@@ -206,6 +207,10 @@ class Vimeo extends Tech {
     return 1;
   }
 
+  readyState() {
+    return 3; /// HAVE_FUTURE_DATA
+  }
+
 }
 
 Vimeo.prototype.featuresTimeupdateEvents = true;
@@ -271,4 +276,4 @@ if (typeof videojs.registerTech !== 'undefined') {
 // Include the version number.
 Vimeo.VERSION = '0.0.1';
 
-export default Vimeo;
+export { Vimeo as default };
