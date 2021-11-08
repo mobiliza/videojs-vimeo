@@ -93,7 +93,7 @@ class Vimeo extends Tech {
     this._player = new VimeoPlayer__default["default"](this.el(), vimeoOptions);
     this.initVimeoState();
 
-    ['play', 'pause', 'ended', 'timeupdate', 'progress', 'seeked'].forEach(e => {
+    ['play', 'pause', 'ended', 'timeupdate', 'seeked'].forEach(e => {
       this._player.on(e, (progress) => {
         if (this._vimeoState.progress.duration !== progress.duration) {
           this.trigger('durationchange');
@@ -114,7 +114,19 @@ class Vimeo extends Tech {
     });
     this._player.on('volumechange', (v) => (this._vimeoState.volume = v));
     this._player.on('error', e => this.trigger('error', e));
-    this._player.on('playing', e => this.trigger('playing', e));
+    this._player.on('playing', progress => this.trigger('playing', progress));
+    this._player.on('progress', progress => {
+        this._vimeoState.buffer = progress;
+        this.trigger('progress');
+    });
+    this._player.on('bufferstart', () => {
+        this._vimeoState.bufferStarted = true;
+        this._vimeoState.bufferEnded = false;
+    });
+    this._player.on('bufferend', () => {
+        this._vimeoState.bufferStarted = false;
+        this._vimeoState.bufferEnded = true;
+    });
 
     this.triggerReady();
   }
@@ -128,7 +140,14 @@ class Vimeo extends Tech {
         seconds: 0,
         percent: 0,
         duration: 0
-      }
+      },
+      buffer: {
+        seconds: 0,
+        percent: 0,
+        duration: 0,
+      },
+      bufferStarted: false,
+      bufferEnded: false,
     };
 
     this._player.getCurrentTime().then(time => (state.progress.seconds = time));
@@ -185,7 +204,7 @@ class Vimeo extends Tech {
   }
 
   buffered() {
-    const progress = this._vimeoState.progress;
+    const progress = this._vimeoState.buffer;
 
     return videojs__default["default"].createTimeRange(0, progress.percent * progress.duration);
   }
@@ -215,7 +234,16 @@ class Vimeo extends Tech {
   }
 
   readyState() {
-    return 3; /// HAVE_FUTURE_DATA
+    if (!this._player) {
+      return 0; /// HAVE_NOTHING
+    }
+    if (!this._vimeoState.bufferStarted && !this._vimeoState.bufferEnded) {
+      if (!this._vimeoState.progress || !this._vimeoState.progress.duration) {
+          return 0; /// HAVE_NOTHING
+      }
+      return 1; /// HAVE_METADATA
+    }
+    return 4; /// HAVE_ENOUGH_DATA
   }
 
 }
