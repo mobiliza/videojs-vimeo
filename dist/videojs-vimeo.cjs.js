@@ -126,13 +126,17 @@ class Vimeo extends Tech {
     this._player.on('bufferend', () => {
         this._vimeoState.bufferStarted = false;
         this._vimeoState.bufferEnded = true;
+        if (!this._vimeoState.loadedData) {
+            this.trigger('loadeddata');
+        }
+        this._vimeoState.loadedData = true;
     });
 
-    this.triggerReady();
+    this.getFirstVimeoStateValues().then(() => this.triggerReady());
   }
 
   initVimeoState() {
-    const state = this._vimeoState = {
+    this._vimeoState = {
       ended: false,
       playing: false,
       volume: 0,
@@ -148,13 +152,17 @@ class Vimeo extends Tech {
       },
       bufferStarted: false,
       bufferEnded: false,
+      loadedData: false,
     };
-
-    this._player.getCurrentTime().then(time => (state.progress.seconds = time));
-    this._player.getDuration().then(time => (state.progress.duration = time));
-    this._player.getPaused().then(paused => (state.playing = !paused));
-    this._player.getVolume().then(volume => (state.volume = volume));
   }
+
+  async getFirstVimeoStateValues() {
+    this._vimeoState.progress.seconds = await this._player.getCurrentTime();
+    this._vimeoState.progress.duration = await this._player.getDuration();
+    this._vimeoState.playing = !(await this._player.getPaused());
+    this._vimeoState.volume = await this._player.getVolume();
+  }
+
 
   createEl() {
     const div = videojs__default["default"].dom.createEl('div', {
@@ -238,10 +246,13 @@ class Vimeo extends Tech {
       return 0; /// HAVE_NOTHING
     }
     if (!this._vimeoState.bufferStarted && !this._vimeoState.bufferEnded) {
-      if (!this._vimeoState.progress || !this._vimeoState.progress.duration) {
+      if (!this._vimeoState.progress || this._vimeoState.progress.duration == 0) {
           return 0; /// HAVE_NOTHING
       }
       return 1; /// HAVE_METADATA
+    }
+    else if (this._vimeoState.bufferStarted) {
+      return 2; /// HAVE_CURRENT_DATA
     }
     return 4; /// HAVE_ENOUGH_DATA
   }
