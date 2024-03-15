@@ -59,7 +59,6 @@ class Vimeo extends Tech {
 
   initVimeoPlayer() {
     const vimeoOptions = {
-      // ...this.props.options_.vimeoOptions,
       url: this.options_.source.src,
       byline: false,
       portrait: false,
